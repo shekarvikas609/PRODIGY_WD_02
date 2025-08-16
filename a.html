@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --primary-color: #ff6b6b;
+            --secondary-color: #6a11cb;
+            --accent-color: #2575fc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 40px 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+        }
+
+        .display {
+            font-size: 3.5rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(106, 17, 203, 0.3);
+        }
+        
+        .display span {
+            display: inline-block;
+            min-width: 50px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--primary-color), #ff9800);
+            border: none;
+            color: var(--text-color);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn.start {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        .btn.start:hover {
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .btn.pause {
+            background: linear-gradient(45deg, #ff9800, #ffc107);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+        }
+        .btn.pause:hover {
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.6);
+        }
+
+        .btn.reset {
+            background: linear-gradient(45deg, #f44336, #e91e63);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+        }
+        .btn.reset:hover {
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.6);
+        }
+
+        .btn.lap {
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+            box-shadow: 0 4px 15px rgba(106, 17, 203, 0.4);
+        }
+        .btn.lap:hover {
+            box-shadow: 0 6px 20px rgba(106, 17, 203, 0.6);
+        }
+        
+        .lap-list-container {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #888 #555;
+        }
+
+        .lap-list-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .lap-list-container::-webkit-scrollbar-track {
+            background: #555;
+            border-radius: 10px;
+        }
+        .lap-list-container::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 10px;
+            border: 2px solid #555;
+        }
+
+        .lap-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .lap-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .lap-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .lap-item:last-child {
+            border-bottom: none;
+        }
+
+        .lap-number {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .lap-time {
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .display {
+                font-size: 2.5rem;
+            }
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .btn {
+                width: 100%;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stopwatch</h1>
+        <div class="display">
+            <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>.<span id="milliseconds">00</span>
+        </div>
+        <div class="controls">
+            <button class="btn start" id="start-btn">Start</button>
+            <button class="btn lap" id="lap-btn" disabled>Lap</button>
+            <button class="btn reset" id="reset-btn" disabled>Reset</button>
+        </div>
+        <div class="lap-list-container">
+            <ul class="lap-list" id="laps"></ul>
+        </div>
+    </div>
+
+    <script>
+        const display = document.querySelector('.display');
+        const startBtn = document.getElementById('start-btn');
+        const lapBtn = document.getElementById('lap-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const lapsList = document.getElementById('laps');
+
+        let startTime, updatedTime, tInterval, running = false, lapCounter = 0;
+        let difference = 0;
+
+        function startStopwatch() {
+            if (!running) {
+                startTime = new Date().getTime() - difference;
+                tInterval = setInterval(getShowTime, 10);
+                running = true;
+
+                startBtn.textContent = 'Pause';
+                startBtn.classList.remove('start');
+                startBtn.classList.add('pause');
+                lapBtn.disabled = false;
+                resetBtn.disabled = false;
+            } else {
+                clearInterval(tInterval);
+                difference = new Date().getTime() - startTime;
+                running = false;
+
+                startBtn.textContent = 'Start';
+                startBtn.classList.remove('pause');
+                startBtn.classList.add('start');
+            }
+        }
+
+        function getShowTime() {
+            updatedTime = new Date().getTime();
+            difference = updatedTime - startTime;
+
+            let hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            let milliseconds = Math.floor((difference % 1000) / 10);
+
+            hours = (hours < 10) ? "0" + hours : hours;
+            minutes = (minutes < 10) ? "0" + minutes : minutes;
+            seconds = (seconds < 10) ? "0" + seconds : seconds;
+            milliseconds = (milliseconds < 10) ? "0" + milliseconds : milliseconds;
+
+            display.querySelector('#hours').textContent = hours;
+            display.querySelector('#minutes').textContent = minutes;
+            display.querySelector('#seconds').textContent = seconds;
+            display.querySelector('#milliseconds').textContent = milliseconds;
+        }
+
+        function resetStopwatch() {
+            clearInterval(tInterval);
+            running = false;
+            difference = 0;
+            lapCounter = 0;
+
+            display.querySelector('#hours').textContent = '00';
+            display.querySelector('#minutes').textContent = '00';
+            display.querySelector('#seconds').textContent = '00';
+            display.querySelector('#milliseconds').textContent = '00';
+
+            startBtn.textContent = 'Start';
+            startBtn.classList.remove('pause');
+            startBtn.classList.add('start');
+            lapBtn.disabled = true;
+            resetBtn.disabled = true;
+
+            lapsList.innerHTML = '';
+        }
+
+        function recordLap() {
+            if (running) {
+                lapCounter++;
+                const lapTime = display.textContent;
+                const lapItem = document.createElement('li');
+                lapItem.classList.add('lap-item');
+                lapItem.innerHTML = `
+                    <span class="lap-number">Lap ${lapCounter}</span>
+                    <span class="lap-time">${lapTime}</span>
+                `;
+                lapsList.prepend(lapItem);
+            }
+        }
+
+        startBtn.addEventListener('click', startStopwatch);
+        resetBtn.addEventListener('click', resetStopwatch);
+        lapBtn.addEventListener('click', recordLap);
+
+    </script>
+</body>
+</html>
